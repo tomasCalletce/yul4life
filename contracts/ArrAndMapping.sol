@@ -10,7 +10,8 @@ contract ArrAndMapping{
     }
     mapping (uint => Data) public data;
     uint8[] public arr;
-    
+    mapping(uint => mapping(uint => uint)) public superData;
+
 
     constructor(){
         data[1] = Data(1,4);
@@ -18,6 +19,7 @@ contract ArrAndMapping{
         arr.push(9);
         arr.push(4);
         arr.push(2);
+        superData[1][1] = 7;
     }
     
     function getAofIndex(uint _index) external view returns(uint _a){
@@ -39,6 +41,19 @@ contract ArrAndMapping{
             let _val := sload(add(_slot,_arrStart))
             let _shift := shr(mul(8,_offset),_val)
             _e := and(0x00000000000000000000000000000000000000000000000000000000000000ff,_shift)
+        }
+    }
+
+    // the order matters make sure to keccak256(index,slot)
+    function getFromSuperData(uint _0,uint _1) external view returns(uint _x){
+        assembly{
+            mstore(0x0,_0)
+            mstore(0x20,superData.slot)
+            let _sl := keccak256(0x00,0x40)
+            mstore(0x0,_1)
+            mstore(0x20,_sl)
+            let _loc:= keccak256(0x00,0x40)
+            _x := sload(_loc)
         }
     }
 
